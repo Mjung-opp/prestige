@@ -1,0 +1,566 @@
+<style>
+    #shopify-section-{{ section.id }} {
+      --image-with-text-content-max-width: {% if section.settings.content_width == 'sm' %}430px{% elsif section.settings.content_width == 'md' %}780px{% else %}100%{% endif %};
+    }
+  </style>
+
+{%- if section.blocks.size > 0 -%}
+  {%- assign color_scheme_hash = section.settings.color_scheme.settings.background_gradient | default: section.settings.color_scheme.settings.background | md5 -%}
+
+  <div class="section-spacing color-scheme color-scheme--{{ section.settings.color_scheme.id }} color-scheme--bg-{{ color_scheme_hash }} {% if section.settings.separate_section_with_border %}bordered-section{% endif %}">
+    <div class="container {% if section.settings.text_alignment == 'center' %}container--xl{% endif %}">
+      <div class="section-stack">
+        {%- render 'section-header', subheading: section.settings.subheading, heading: section.settings.title, text_alignment: section.settings.text_alignment -%}
+
+        {% comment %}Desktop Tabs Layout{% endcomment %}
+        <x-tabs class="content-tabs {% if section.settings.text_alignment == 'center' %}content-tabs--center{% endif %} hidden sm:block">
+          <template shadowrootmode="open">
+            <slot role="tablist" part="tab-list" name="title"></slot>
+            <slot part="tab-panel-list" name="content"></slot>
+          </template>
+
+          {% for block in section.blocks %}
+            {% if block.type == 'tab' %}
+              <button class="h6" type="button" role="tab" slot="title" {{ block.shopify_attributes }} style="color: {{ block.settings.title_color }};">
+                {{ block.settings.title }}
+              </button>
+            {% endif %}
+          {% endfor %}
+
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'tab' -%}
+              <div role="tabpanel" slot="content" {% unless forloop.first %}hidden{% endunless %}>
+                {%- assign content_width_px = '430px' -%}
+                {%- if block.settings.content_width == 'md' -%}
+                  {%- assign content_width_px = '780px' -%}
+                {%- elsif block.settings.content_width == 'lg' -%}
+                  {%- assign content_width_px = '100%' -%}
+                {%- endif -%}
+                
+                <image-with-text class="image-with-text {% if block.settings.image_position == 'end' %}image-with-text--reverse{% endif %}" style="--image-with-text-content-max-width: {{ content_width_px }};">
+                  {%- comment -%} Video or Image rendering {%- endcomment -%}
+                  {%- if block.settings.video != blank -%}
+                    <div class="media-wrapper">
+                      {{ block.settings.video | video_tag: 
+                        autoplay: block.settings.video_autoplay, 
+                        loop: block.settings.video_loop, 
+                        muted: block.settings.video_muted,
+                        controls: block.settings.video_controls,
+                        class: 'media-video'
+                      }}
+                    </div>
+                  {%- elsif block.settings.image != blank -%}
+                    <picture>
+                      {%- assign sizes = '(max-width: 699px) 100vw, 50vw' -%}
+                      {%- if block.settings.mobile_image != blank -%}
+                        <source
+                            media="(max-width: 699px)"
+                            srcset="{{ block.settings.mobile_image | image_url: width: 400 }} 400w, {{ block.settings.mobile_image | image_url: width: 600 }} 600w, {{ block.settings.mobile_image | image_url: width: 800 }} 800w, {{ block.settings.mobile_image | image_url: width: 1000 }} 1000w"
+                            width="{{ block.settings.mobile_image.width }}"
+                            height="{{ block.settings.mobile_image.height }}"
+                        >
+                      {%- endif -%}
+                      {{- block.settings.image | image_url: width: block.settings.image.width | image_tag: sizes: sizes, widths: '200,300,400,500,600,700,800,900,1000,1200,1400,1600,1800,2000,2200,2400', reveal-on-scroll: block.settings.reveal_on_scroll -}}
+                    </picture>
+                  {%- else -%}
+                    {{- 'image' | placeholder_svg_tag: 'placeholder' -}}
+                  {%- endif -%}
+
+                  <div class="prose text-center sm:text-start" style="max-width: var(--image-with-text-content-max-width, 430px);">
+                    {%- for content_block in section.blocks limit: forloop.length offset: forloop.index -%}
+                      {%- if content_block.type != 'tab' -%}
+                        
+                      {%- else -%}
+                        {%- break -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                  </div>
+                </image-with-text>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </x-tabs>
+
+        {% comment %}Mobile Accordion Layout{% endcomment %}
+        <div class="accordion-group sm:hidden">
+          {% for block in section.blocks %}
+            {% if block.type == 'tab' %}
+              {% capture accordion_content %}
+                <image-with-text class="image-with-text image-with-text--reverse">
+                  {%- if block.settings.video != blank -%}
+                    <div class="media-wrapper">
+                      {{ block.settings.video | video_tag: 
+                        autoplay: block.settings.video_autoplay, 
+                        loop: block.settings.video_loop, 
+                        muted: block.settings.video_muted,
+                        controls: block.settings.video_controls,
+                        class: 'media-video'
+                      }}
+                    </div>
+                  {%- elsif block.settings.image != blank -%}
+                    <picture>
+                      {%- assign sizes = '(max-width: 699px) 100vw, 50vw' -%}
+                      {%- if block.settings.mobile_image != blank -%}
+                        <source
+                            media="(max-width: 699px)"
+                            srcset="{{ block.settings.mobile_image | image_url: width: 400 }} 400w, {{ block.settings.mobile_image | image_url: width: 600 }} 600w, {{ block.settings.mobile_image | image_url: width: 800 }} 800w, {{ block.settings.mobile_image | image_url: width: 1000 }} 1000w"
+                            width="{{ block.settings.mobile_image.width }}"
+                            height="{{ block.settings.mobile_image.height }}"
+                        >
+                      {%- endif -%}
+                      {{- block.settings.image | image_url: width: block.settings.image.width | image_tag: sizes: sizes, widths: '200,300,400,500,600,700,800,900,1000,1200,1400,1600,1800,2000,2200,2400', reveal-on-scroll: block.settings.reveal_on_scroll -}}
+                    </picture>
+                  {%- else -%}
+                    {{- 'image' | placeholder_svg_tag: 'placeholder' -}}
+                  {%- endif -%}
+                  
+                  <div class="prose text-center sm:text-start">
+                    {% for content_block in section.blocks limit: forloop.length offset: forloop.index %}
+                      {% if content_block.type != 'tab' %}
+                     
+                      {% else %}
+                        {% break %}
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </image-with-text>
+              {% endcapture %}
+              
+              {% render 'accordion', 
+                title: block.settings.title, 
+                open: block.settings.open_on_mobile,
+                content: accordion_content 
+              %}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+<style>
+  /* Custom styles for H5 subheadings in tabs */
+  .shopify-section--tabs h5.tab-subheading {
+    font-size: 1.125rem;
+    font-weight: 500;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Scroll button styles */
+  .scroll-to-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .scroll-to-button:hover {
+    transform: translateY(2px);
+  }
+
+  /* Video wrapper styles */
+  .media-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .media-wrapper .media-video {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+</style>
+
+<script>
+  // Smooth scroll functionality - works with shadow DOM
+  (function() {
+    function initScrollButtons() {
+      // Find all scroll buttons in the main document
+      const scrollButtons = document.querySelectorAll('.scroll-to-button');
+      
+      // Find scroll buttons inside shadow DOM (x-tabs)
+      const xTabs = document.querySelectorAll('x-tabs');
+      const shadowButtons = [];
+      
+      xTabs.forEach(tab => {
+        if (tab.shadowRoot) {
+          const buttonsInShadow = tab.shadowRoot.querySelectorAll('.scroll-to-button');
+          shadowButtons.push(...buttonsInShadow);
+        }
+      });
+      
+      // Also check for buttons in slots
+      const allButtons = [...scrollButtons, ...shadowButtons];
+      
+      // If no buttons found in shadow DOM, try querySelectorAll on document for slotted content
+      if (allButtons.length === 0) {
+        document.querySelectorAll('.scroll-to-button').forEach(btn => allButtons.push(btn));
+      }
+      
+      allButtons.forEach(button => {
+        // Remove existing listener to prevent duplicates
+        button.removeEventListener('click', handleScrollClick);
+        // Add new listener
+        button.addEventListener('click', handleScrollClick);
+      });
+    }
+    
+    function handleScrollClick(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('data-scroll-target');
+      const targetElement = document.querySelector(targetId);
+      
+      if (targetElement) {
+        const offset = 100; // Adjust this value for header height if needed
+        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - offset;
+        
+        window.scrollTo({
+          top: targetPosition,
+          behavior: 'smooth'
+        });
+      } else {
+        console.warn('Scroll target not found:', targetId);
+      }
+    }
+    
+    // Initialize on DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initScrollButtons);
+    } else {
+      initScrollButtons();
+    }
+    
+    // Re-initialize when content changes (for dynamic content)
+    if (typeof MutationObserver !== 'undefined') {
+      const observer = new MutationObserver(initScrollButtons);
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Advanced Tabs",
+  "class": "shopify-section--tabs",
+  "max_blocks": 40,
+  "disabled_on": {
+    "groups": ["header", "custom.overlay"]
+  },
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "separate_section_with_border",
+      "label": "Separate section with border",
+      "default": true
+    },
+    {
+      "type": "inline_richtext",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "label": "Heading",
+      "default": "Advanced Tabs"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "start", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "center"
+    },   
+     
+    {
+      "type": "select",
+      "id": "content_width",
+      "label": "t:global.sizes.content_width",
+      "options": [
+        {
+          "value": "sm",
+          "label": "t:global.sizes.small"
+        },
+        {
+          "value": "md",
+          "label": "t:global.sizes.medium"
+        },
+        {
+          "value": "lg",
+          "label": "t:global.sizes.large"
+        }
+      ],
+      "default": "sm"
+    },
+    {
+      "type": "checkbox",
+      "id": "remove_vertical_spacing",
+      "label": "t:global.spacing.remove_vertical_spacing",
+      "default": true
+    }
+  
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab Title & Layout",
+      "settings": [
+        {
+          "type": "color",
+          "id": "title_color",
+          "label": "Title Color"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Title",
+          "default": "Tab Title"
+        },
+        {
+          "type": "paragraph",
+          "content": "Choose either a video OR an image. Video takes priority if both are selected."
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        },
+        {
+          "type": "checkbox",
+          "id": "video_autoplay",
+          "label": "Video autoplay",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "video_loop",
+          "label": "Video loop",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "video_muted",
+          "label": "Video muted",
+          "default": true,
+          "info": "Video must be muted for autoplay to work"
+        },
+        {
+          "type": "checkbox",
+          "id": "video_controls",
+          "label": "Show video controls",
+          "default": false
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "Mobile image"
+        },
+        {
+          "type": "select",
+          "id": "image_position",
+          "label": "Desktop image position",
+          "options": [
+            { "value": "start", "label": "Left" },
+            { "value": "end", "label": "Right" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "content_width",
+          "label": "Content width",
+          "options": [
+            { "value": "sm", "label": "Small" },
+            { "value": "md", "label": "Medium" },
+            { "value": "lg", "label": "Large" }
+          ],
+          "default": "sm"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_on_mobile",
+          "label": "Open this tab by default on mobile",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        { "type": "inline_richtext", "id": "text", "label": "Text", "default": "Heading" },
+        {
+          "type": "select",
+          "id": "heading_tag",
+          "label": "Style",
+          "options": [
+            { "value": "h1", "label": "H1" },
+            { "value": "h2", "label": "H2" },
+            { "value": "h3", "label": "H3" }
+          ],
+          "default": "h2"
+        }
+      ]
+    },
+    {
+      "type": "subheading",
+      "name": "Subheading",
+      "settings": [
+        { "type": "inline_richtext", "id": "text", "label": "Text", "default": "Subheading" }
+      ]
+    },
+    {
+      "type": "richtext",
+      "name": "Paragraph",
+      "settings": [
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Use this text to share information about your brand with your customers.</p>" }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Button text" },
+        { "type": "url", "id": "url", "label": "Link" }
+      ]
+    },
+    {
+      "type": "scroll_button",
+      "name": "Scroll Button",
+      "settings": [
+        { 
+          "type": "text", 
+          "id": "text", 
+          "label": "Button Text", 
+          "default": "View Product Details" 
+        },
+        { 
+          "type": "text", 
+          "id": "scroll_target", 
+          "label": "Scroll Target ID", 
+          "default": "#product-info",
+          "info": "Enter the CSS selector of the section to scroll to (e.g., #product-info, #specifications, .product-details)" 
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Button Style",
+          "options": [
+            { "value": "primary", "label": "Primary Button" },
+            { "value": "secondary", "label": "Secondary Button" },
+            { "value": "link", "label": "Text Link" }
+          ],
+          "default": "primary"
+        },
+        {
+          "type": "header",
+          "content": "Icon Settings"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_icon",
+          "label": "Show Icon",
+          "default": true
+        },
+        {
+          "type": "select",
+          "id": "icon_type",
+          "label": "Icon Type",
+          "options": [
+            { "value": "arrow-down", "label": "Arrow Up" },
+            { "value": "chevron-down", "label": "Chevron Up" },
+            { "value": "none", "label": "No Icon" }
+          ],
+          "default": "arrow-down"
+        },
+        {
+          "type": "header",
+          "content": "Color Customization"
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background Color",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "background_color_hover",
+          "label": "Background Color (Hover)",
+          "default": "#333333"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text Color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "color",
+          "id": "text_color_hover",
+          "label": "Text Color (Hover)",
+          "default": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "type": "link",
+      "name": "Link",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Link" },
+        { "type": "url", "id": "url", "label": "Link" }
+      ]
+    },
+    {
+      "type": "liquid",
+      "name": "t:sections.tabs.blocks.liquid.name",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "t:global.text.title",
+          "default": "Tab"
+        },
+        {
+          "type": "liquid",
+          "id": "liquid",
+          "label": "t:global.code.liquid",
+          "default": "<p>Use Liquid code to create advanced customization.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Advanced Tabs",
+      "blocks": [
+        { "type": "tab" },
+        { "type": "heading" },
+        { "type": "richtext" },
+        { "type": "scroll_button" },
+        { "type": "tab" },
+        { "type": "heading" },
+        { "type": "richtext" }
+      ]
+    }
+  ]
+}
+{% endschema %}
