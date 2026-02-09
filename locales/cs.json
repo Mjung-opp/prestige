@@ -90,6 +90,7 @@
       "choose_options": "Vyberte možnosti",
       "view_details": "Zobrazit podrobnosti",
       "added_to_cart": "Zboží bylo přidáno do vašeho košíku!",
+      "added_to_cart_with_title": "{{ product_title }} byl přidán do košíku.",
       "sold_out_badge": "Vyprodáno",
       "on_sale_badge": "Výprodej",
       "discount_badge_html": "Ušetřete {{ savings }}",
@@ -392,6 +393,10 @@
       "one_result": "Pro vaši adresu je k dispozici jedna sazba za dopravu:",
       "multiple_results": "Pro vaši adresu je k dispozici několik sazeb za dopravu:",
       "error": "Při načítání přepravních sazeb došlo k jedné nebo více chyb:"
+    },
+    "discount": {
+      "label": "Slevový kód",
+      "error": "Zadejte platný slevový kód"
     }
   },
   "404": {

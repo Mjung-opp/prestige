@@ -90,6 +90,7 @@
       "choose_options": "Izberite možnosti",
       "view_details": "Prikaz podrobnosti",
       "added_to_cart": "Dodano v vašo košarico!",
+      "added_to_cart_with_title": "{{ product_title }} je bil dodan v košarico.",
       "sold_out_badge": "Razprodano",
       "on_sale_badge": "Znižano",
       "discount_badge_html": "Prihranek {{ savings }}",
@@ -392,6 +393,10 @@
       "one_result": "Za vaš naslov je na voljo ena tarifa za pošiljanje:",
       "multiple_results": "Za vaš naslov je na voljo več tarif za pošiljanje:",
       "error": "Napaka med pridobivanjem tarif za pošiljanje:"
+    },
+    "discount": {
+      "label": "Koda za popust",
+      "error": "Vnesite veljavno kodo za popust"
     }
   },
   "404": {

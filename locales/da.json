@@ -90,6 +90,7 @@
       "choose_options": "Vælg muligheder",
       "view_details": "Vis oplysninger",
       "added_to_cart": "Føjet til din indkøbskurv!",
+      "added_to_cart_with_title": "{{ product_title }} er blevet tilføjet til kurven.",
       "sold_out_badge": "Udsolgt",
       "on_sale_badge": "På tilbud",
       "discount_badge_html": "Spar {{ savings }}",
@@ -382,6 +383,10 @@
       "one_result": "Der er én leveringspris for din adresse:",
       "multiple_results": "Der er flere leveringspriser for din adresse:",
       "error": "Der opstod en eller flere fejl under hentning af leveringspriser:"
+    },
+    "discount": {
+      "label": "Rabatkode",
+      "error": "Indtast en gyldig rabatkode"
     }
   },
   "404": {
